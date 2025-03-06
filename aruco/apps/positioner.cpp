@@ -289,21 +289,21 @@ auto main(int argc, char *argv[]) -> int {
         visualizer.update(fit_result);
         visualizer.refresh();
 
-        image.copyTo(render_image);
-        cv::aruco::drawDetectedMarkers(render_image, fit_result.corners,
-                                       fit_result.ids);
+        // image.copyTo(render_image);
+        // cv::aruco::drawDetectedMarkers(render_image, fit_result.corners,
+        //                                fit_result.ids);
         if (video_output_file) {
-            output.write(render_image);
+            // output.write(render_image);
         } else {
             const std::chrono::nanoseconds target_after_start{
                 1'000'000 *
                 static_cast<std::int64_t>(capture.get(cv::CAP_PROP_POS_MSEC))};
             std::this_thread::sleep_until(start_time + target_after_start);
 
-            cv::imshow("out", render_image);
-            if (handle_keys()) {
-                break;
-            }
+            // cv::imshow("out", render_image);
+            // if (handle_keys()) {
+            //     break;
+            // }
         }
     }
 #endif

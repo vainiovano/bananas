@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <iterator>
+#include <opencv2/objdetect/aruco_detector.hpp>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -33,6 +34,14 @@ struct PlacementJson {
 [[maybe_unused]] NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlacementJson, id,
                                                     board_to_world);
 
+auto getParams() -> cv::aruco::DetectorParameters {
+    cv::aruco::DetectorParameters params{};
+    params.useAruco3Detection = true;
+    params.minMarkerLengthRatioOriginalImg = 0.01F;
+    params.adaptiveThreshWinSizeMax = 5;
+    return params;
+}
+
 } // namespace
 
 namespace world {
@@ -51,7 +60,7 @@ World::World(cv::Mat camera_matrix, cv::Mat distortion_coeffs,
              const cv::aruco::Dictionary &dictionary)
     : camera_matrix_{std::move(camera_matrix)},
       distortion_coeffs_{std::move(distortion_coeffs)},
-      dictionary_{&dictionary}, detector_{dictionary, {}},
+      dictionary_{&dictionary}, detector_{dictionary, getParams()},
       static_environment_{cv::Mat(0, 0, CV_32FC3), dictionary, {}} {}
 
 auto World::addBoard(const board::Board &board) -> BoardId {
@@ -121,8 +130,9 @@ auto World::fit(const cv::Mat &image) const -> FitResult {
 }
 
 auto World::fitBoard(const std::vector<std::vector<cv::Point2f>> &corners,
-                     const std::vector<int> &ids, const cv::aruco::Board &board)
-    const -> std::optional<UncertainPose> {
+                     const std::vector<int> &ids,
+                     const cv::aruco::Board &board) const
+    -> std::optional<UncertainPose> {
     if (ids.empty()) {
         return {};
     }
