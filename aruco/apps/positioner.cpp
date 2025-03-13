@@ -259,6 +259,8 @@ auto main(int argc, char *argv[]) -> int {
         visualizer.forceVisible(id);
     }
 
+    cv::namedWindow("out", cv::WINDOW_NORMAL);
+
 #ifdef ENABLE_ROS2
     const auto node{std::make_shared<RosPositioner>(world, visualizer)};
     rclcpp::spin(node);
