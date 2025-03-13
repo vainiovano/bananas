@@ -10,7 +10,7 @@ set_target_properties(positioner PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_options(positioner PRIVATE -Wall -Wextra -Wpedantic)
 # NOTE: Can't use PRIVATE/PUBLIC here because ament_target_dependencies doesn't
 # support them.
-target_link_libraries(positioner ${OpenCV_LIBS} aruco_detector aruco_visualizer
+target_link_libraries(positioner ${OpenCV_LIBS} bananas_aruco aruco_visualizer
                       Microsoft.GSL::GSL)
 if(WITH_ROS2)
   target_compile_definitions(positioner PRIVATE ENABLE_ROS2)
@@ -37,5 +37,5 @@ set_target_properties(gltf_exporter PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_options(gltf_exporter PRIVATE -Wall -Wextra -Wpedantic)
 target_link_libraries(
   gltf_exporter
-  PRIVATE ${OpenCV_LIBS} aruco_detector tinygltf Microsoft.GSL::GSL
+  PRIVATE ${OpenCV_LIBS} bananas_aruco tinygltf Microsoft.GSL::GSL
           nlohmann_json::nlohmann_json tinyxml2::tinyxml2)

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16...3.31)
 project(
-  BananasArucoDetector
-  VERSION 1.0
+  BananasAruco
+  VERSION 0.1
   DESCRIPTION "Try to find boxes using ArUco markers"
   LANGUAGES CXX)
 
@@ -67,6 +67,11 @@ if(WITH_ROS2)
   find_package(sensor_msgs CONFIG REQUIRED)
   find_package(cv_bridge CONFIG REQUIRED)
   find_package(image_transport CONFIG REQUIRED)
+endif()
+
+option(WITH_NPP "Enable custom NPP-based ArUco detector" OFF)
+if(WITH_NPP)
+  add_subdirectory(aruco_detector)
 endif()
 
 add_subdirectory(src)

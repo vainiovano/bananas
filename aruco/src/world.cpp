@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cstdint>
 #include <iterator>
-#include <opencv2/objdetect/aruco_detector.hpp>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -21,6 +20,7 @@
 #include <opencv2/objdetect/aruco_dictionary.hpp>
 
 #include <bananas_aruco/affine_rotation.h>
+#include <bananas_aruco/aruco_detector.h>
 #include <bananas_aruco/board.h>
 
 namespace {
@@ -34,11 +34,11 @@ struct PlacementJson {
 [[maybe_unused]] NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlacementJson, id,
                                                     board_to_world);
 
-auto getParams() -> cv::aruco::DetectorParameters {
-    cv::aruco::DetectorParameters params{};
-    params.useAruco3Detection = true;
-    params.minMarkerLengthRatioOriginalImg = 0.01F;
-    params.adaptiveThreshWinSizeMax = 5;
+auto getParams() -> aruco_detector::DetectorParameters {
+    aruco_detector::DetectorParameters params{};
+    // params.useAruco3Detection = true;
+    // params.minMarkerLengthRatioOriginalImg = 0.01F;
+    // params.adaptiveThreshWinSizeMax = 5;
     return params;
 }
 

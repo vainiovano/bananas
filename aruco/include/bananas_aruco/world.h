@@ -13,10 +13,10 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/objdetect/aruco_board.hpp>
-#include <opencv2/objdetect/aruco_detector.hpp>
 #include <opencv2/objdetect/aruco_dictionary.hpp>
 
 #include <bananas_aruco/affine_rotation.h>
+#include <bananas_aruco/aruco_detector.h>
 #include <bananas_aruco/board.h>
 
 namespace world {
@@ -58,8 +58,9 @@ class World {
   private:
     [[nodiscard]]
     auto fitBoard(const std::vector<std::vector<cv::Point2f>> &corners,
-                  const std::vector<int> &ids, const cv::aruco::Board &board)
-        const -> std::optional<UncertainPose>;
+                  const std::vector<int> &ids,
+                  const cv::aruco::Board &board) const
+        -> std::optional<UncertainPose>;
 
     void recomputeStaticEnvironment();
 
@@ -70,7 +71,7 @@ class World {
     cv::Mat camera_matrix_;
     cv::Mat distortion_coeffs_;
     gsl::not_null<const cv::aruco::Dictionary *> dictionary_;
-    cv::aruco::ArucoDetector detector_;
+    aruco_detector::ArucoDetector detector_;
     cv::aruco::Board static_environment_;
     BoardPlacement static_board_placements_{};
     std::vector<cv::aruco::Board> all_boards_{};

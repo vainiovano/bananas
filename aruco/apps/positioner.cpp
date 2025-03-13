@@ -242,21 +242,21 @@ auto main(int argc, char *argv[]) -> int {
     const auto dictionary{
         cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_100)};
     world::World world{camera_matrix, distortion_coefficients, dictionary};
-    visualizer::Visualizer visualizer{};
+    // visualizer::Visualizer visualizer{};
     for (const auto &board : boards) {
         std::visit(
-            [&world, &visualizer](const auto &settings) {
+            [&world/*, &visualizer*/](const auto &settings) {
                 const auto board_id{
                     world.addBoard(board::make_board(settings))};
-                visualizer.addObject(board_id, settings);
+                // visualizer.addObject(board_id, settings);
             },
             board);
     }
 
     for (const auto &[id, placement] : static_environment) {
         world.makeStatic(id, placement);
-        visualizer.update(id, placement);
-        visualizer.forceVisible(id);
+        // visualizer.update(id, placement);
+        // visualizer.forceVisible(id);
     }
 
     cv::namedWindow("out", cv::WINDOW_NORMAL);
@@ -279,15 +279,27 @@ auto main(int argc, char *argv[]) -> int {
     cv::Mat image{};
     cv::Mat render_image{};
     const auto start_time{std::chrono::system_clock::now()};
+    std::uint64_t total_time{};
+    std::uint32_t num_frames{};
     while (capture.isOpened()) {
         const bool got_frame{capture.read(image)};
         if (!got_frame) {
             break;
         }
 
+        const auto processing_start_time{std::chrono::steady_clock::now()};
         const auto fit_result{world.fit(image)};
-        visualizer.update(fit_result);
-        visualizer.refresh();
+        const auto processing_end_time{std::chrono::steady_clock::now()};
+        const auto processing_time_us{
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                processing_end_time - processing_start_time)
+                .count()};
+        total_time += processing_time_us;
+        ++num_frames;
+        std::cout << "Time: " << processing_time_us << " µs \n";
+
+        // visualizer.update(fit_result);
+        // visualizer.refresh();
 
         // image.copyTo(render_image);
         // cv::aruco::drawDetectedMarkers(render_image, fit_result.corners,
@@ -306,5 +318,6 @@ auto main(int argc, char *argv[]) -> int {
             // }
         }
     }
+    std::cout << "Mean time " << total_time / num_frames << '\n';
 #endif
 }
