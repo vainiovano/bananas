@@ -147,7 +147,7 @@ bool RefineParameters::writeRefineParameters(FileStorage& fs, const String& name
 /**
   * @brief Threshold input image using adaptive thresholding
   */
-static void _threshold(const cuda::GpuMat &_in, cuda::GpuMat &_out, int winSize,
+static void _threshold(const cuda::HostMem &_in, cuda::HostMem &_out, int winSize,
                        double constant,
                        const NppStreamContext &npp_stream_context) {
     CV_Assert(winSize >= 3);
@@ -313,9 +313,9 @@ float static inline getAverageDistance(const std::vector<Point2f>& marker1, cons
  * @brief Initial steps on finding square candidates
  */
 static void _detectInitialCandidates(
-    const cuda::GpuMat &grey, vector<vector<Point2f>> &candidates,
+    const cuda::HostMem &grey, vector<vector<Point2f>> &candidates,
     vector<vector<Point>> &contours, const DetectorParameters &params,
-    vector<cuda::GpuMat> &thresholded, vector<cuda::HostMem> &thresholded_cpu,
+    vector<cuda::HostMem> &thresholded, vector<cuda::HostMem> &thresholded_cpu,
     vector<cuda::Stream> &streams, const NppStreamContext &npp_stream_context) {
     CV_Assert(params.adaptiveThreshWinSizeMin >= 3 &&
               params.adaptiveThreshWinSizeMax >= 3);
@@ -345,7 +345,7 @@ static void _detectInitialCandidates(
         const int end = range.end;
 
         for (int i = begin; i < end; i++) {
-            thresholded[i].download(thresholded_cpu[i], streams[i]);
+            // thresholded[i].download(thresholded_cpu[i], streams[i]);
             streams[i].waitForCompletion();
 
             // detect rectangles
@@ -712,13 +712,13 @@ struct ArucoDetector::ArucoDetectorImpl {
     Size downsampledSize;
 
     /// GPU greyscale image
-    cuda::GpuMat grey;
+    // cuda::GpuMat grey;
 
     /// CPU greyscale image
     cuda::HostMem grey_cpu;
 
     /// GPU thresholded images
-    std::vector<cuda::GpuMat> thresholded;
+    // std::vector<cuda::GpuMat> thresholded;
     /// CPU thresholded images
     std::vector<cuda::HostMem> thresholded_cpu;
 
@@ -746,16 +746,18 @@ struct ArucoDetector::ArucoDetectorImpl {
                               detectorParams.minMarkerLengthRatioOriginalImg))),
           downsampledSize(cvRound(fxfy * _imageSize.width),
                           cvRound(fxfy * _imageSize.height)),
-          grey(downsampledSize, CV_8UC1), grey_cpu(downsampledSize, CV_8UC1),
-          thresholded() {
+          // grey(downsampledSize, CV_8UC1),
+          grey_cpu(downsampledSize, CV_8UC1)
+          // thresholded()
+    {
         int nScales = (_detectorParams.adaptiveThreshWinSizeMax - _detectorParams.adaptiveThreshWinSizeMin) /
                        _detectorParams.adaptiveThreshWinSizeStep + 1;
-        thresholded.resize(nScales);
+        // thresholded.resize(nScales);
         thresholded_cpu.resize(nScales);
         streams.resize(nScales);
-        for (auto &thresholded_image : thresholded) {
-            thresholded_image.create(downsampledSize, CV_8UC1);
-        }
+        // for (auto &thresholded_image : thresholded) {
+        //     thresholded_image.create(downsampledSize, CV_8UC1);
+        // }
         for (auto &thresholded_cpu_image : thresholded_cpu) {
             thresholded_cpu_image.create(downsampledSize, CV_8UC1);
         }
@@ -789,9 +791,9 @@ struct ArucoDetector::ArucoDetectorImpl {
     /**
      * @brief Detect square candidates in the input image
      */
-    void detectCandidates(const cuda::GpuMat& grey, vector<vector<Point2f> >& candidates, vector<vector<Point> >& contours) {
+    void detectCandidates(const cuda::HostMem& grey, vector<vector<Point2f> >& candidates, vector<vector<Point> >& contours) {
         /// 1. DETECT FIRST SET OF CANDIDATES
-        _detectInitialCandidates(grey, candidates, contours, detectorParams, thresholded, thresholded_cpu, streams, npp_stream_context);
+        _detectInitialCandidates(grey, candidates, contours, detectorParams, thresholded_cpu, thresholded_cpu, streams, npp_stream_context);
         /// 2. SORT CORNERS
         _reorderCandidatesCorners(candidates);
     }
@@ -1071,8 +1073,8 @@ void ArucoDetector::detectMarkers(InputArray _image, OutputArrayOfArrays _corner
     }
     /// STEP 2.b Detect marker candidates :: traditional way
     else {
-        arucoDetectorImpl->grey.upload(arucoDetectorImpl->grey_cpu);
-        arucoDetectorImpl->detectCandidates(arucoDetectorImpl->grey, candidates, contours);
+        // arucoDetectorImpl->grey.upload(arucoDetectorImpl->grey_cpu);
+        arucoDetectorImpl->detectCandidates(arucoDetectorImpl->grey_cpu, candidates, contours);
     }
 
      /// STEP 2.c FILTER OUT NEAR CANDIDATE PAIRS
