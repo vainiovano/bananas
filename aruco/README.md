@@ -90,6 +90,13 @@ Drive](https://drive.google.com/drive/folders/1jW_gUaRNqzDQmUnwXLOY9ooAgiT-EK1z?
 ./build/apps/ros_video_publisher video.mp4
 ```
 
+To use camera input
+``` sh
+. /opt/ros/jazzy/setup.bash
+./build/apps/positioner -boards=boards.json -env=static_environment.json -camera=camera.json &
+./build/apps/ros_video_publisher camera
+```
+
 ### Gazebo simulation
 
 #### General notes

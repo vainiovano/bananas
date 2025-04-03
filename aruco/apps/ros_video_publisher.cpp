@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include <opencv2/core/mat.hpp>
 #include <opencv2/videoio.hpp>
@@ -28,42 +29,110 @@ const std::string topic_name{"aruco_camera/image"};
 } // namespace
 
 int main(int argc, char *argv[]) {
-    const auto args{rclcpp::init_and_remove_ros_arguments(argc, argv)};
+    auto args{rclcpp::init_and_remove_ros_arguments(argc, argv)};
     if (args.size() != 2) {
-        std::cerr << "Expected 1 argument, got: "
-                  << (args.empty() ? 0 : args.size() - 1) << '\n';
+        std::cerr << "Usage: " << argv[0] << " [camera|video_file]"
+                  << std::endl;
         return EXIT_FAILURE;
     }
-    const std::string &video_file{args[1]};
 
-    const auto node{
-        rclcpp::Node::make_shared(node_name, rclcpp::NodeOptions{})};
+    const std::string &video_input{args[1]};
+    bool use_camera = (video_input == "camera");
+
+    auto node = rclcpp::Node::make_shared(node_name);
     image_transport::ImageTransport it{node};
-    auto publisher{it.advertise(topic_name, 1)};
+    auto publisher = it.advertise(topic_name, 1);
 
-    cv::VideoCapture capture{video_file};
-    cv::Mat image{};
-    rclcpp::Clock clock{};
-    const rclcpp::Time start_time{clock.now()};
-    while (rclcpp::ok()) {
-        const bool got_frame{capture.read(image)};
-        if (!got_frame) {
-            break;
+    cv::VideoCapture capture;
+    if (use_camera) {
+        // Open the camera using the V4L2 backend.
+        capture.open("/dev/video0", cv::CAP_V4L2);
+        if (!capture.isOpened()) {
+            std::cerr << "Error: Could not open camera device /dev/video0"
+                      << std::endl;
+            return EXIT_FAILURE;
         }
+        std::cout << "Using camera device" << std::endl;
 
-        const rclcpp::Duration target_after_start{std::chrono::nanoseconds{
-            1'000'000 *
-            static_cast<std::int64_t>(capture.get(cv::CAP_PROP_POS_MSEC))}};
-        clock.sleep_until(start_time + target_after_start);
+        // Set camera properties.
+        capture.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
+        capture.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+        capture.set(cv::CAP_PROP_FPS, 30);
 
-        const auto message{
-            cv_bridge::CvImage(
-                std_msgs::msg::Header{},
-                static_cast<const char *>(sensor_msgs::image_encodings::BGR8),
-                image)
-                .toImageMsg()};
-        publisher.publish(message);
-        rclcpp::spin_some(node);
+    } else {
+        // Open the video file.
+        capture.open(video_input);
+        if (!capture.isOpened()) {
+            std::cerr << "Error: Could not open video file: " << video_input
+                      << std::endl;
+            return EXIT_FAILURE;
+        }
+        std::cout << "Using video file: " << video_input << std::endl;
+    }
+
+    cv::Mat image;
+    if (use_camera) {
+        // For live camera capture, determine a fixed delay from the FPS
+        // setting.
+        double fps = capture.get(cv::CAP_PROP_FPS);
+        if (fps <= 0.0) {
+            fps = 30.0; // Fallback FPS if camera doesn't report it correctly.
+        }
+        auto frame_duration =
+            std::chrono::milliseconds(static_cast<int>(1000.0 / fps));
+
+        while (rclcpp::ok()) {
+            if (!capture.read(image)) {
+                std::cerr << "Error: Couldn't capture frame from camera"
+                          << std::endl;
+                break;
+            }
+
+            // Create and populate a header with the current timestamp.
+            std_msgs::msg::Header header;
+            header.stamp = node->now();
+            header.frame_id = "camera_frame";
+
+            auto message =
+                cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8,
+                                   image)
+                    .toImageMsg();
+            publisher.publish(message);
+
+            rclcpp::spin_some(node);
+            std::this_thread::sleep_for(frame_duration);
+        }
+    } else {
+        // For video file playback, synchronize the publishing using the video's
+        // timestamps.
+        rclcpp::Clock clock{};
+        const rclcpp::Time start_time{clock.now()};
+
+        while (rclcpp::ok()) {
+            if (!capture.read(image)) {
+                std::cerr << "Reached end of video or error reading frame."
+                          << std::endl;
+                break;
+            }
+
+            // Use the video's timestamp (in milliseconds) to compute the delay.
+            double pos_msec = capture.get(cv::CAP_PROP_POS_MSEC);
+            rclcpp::Duration target_after_start{std::chrono::nanoseconds(
+                static_cast<long long>(pos_msec * 1e6))};
+            clock.sleep_until(start_time + target_after_start);
+
+            std_msgs::msg::Header header;
+            header.stamp = node->now();
+            header.frame_id = "video_frame";
+
+            auto message =
+                cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8,
+                                   image)
+                    .toImageMsg();
+            publisher.publish(message);
+
+            rclcpp::spin_some(node);
+        }
     }
     rclcpp::shutdown();
     return EXIT_SUCCESS;
