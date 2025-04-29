@@ -195,3 +195,12 @@ button to take off since it forces a minimum altitude of 10 meters. Instead, set
 the `MIS_TAKEOFF_ALT` parameter if needed and use `commander takeoff` on the PX4
 console if you want to perform a manual take off. If you want to fly a mission,
 then starting the mission is enough to make the drone take off.
+
+#### demo_world demo
+
+![Picture of the demo_world demo running](https://github.com/user-attachments/assets/f5c33946-f673-49a8-8b65-41a0f7f5420d)
+
+Similar to drone_world, but `drone_world` needs to be replaced with `demo_world`
+in the setup. I recommend setting the takeoff altitude (`MIS_TAKEOFF_ALT`
+parameter, configurable in QGroundControl) to 0.2 m and taking off from the PX4
+console using `commander takeoff`.

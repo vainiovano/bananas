@@ -1,0 +1,236 @@
+[
+    {
+        "type": "grid",
+        "settings": {
+            "size": {
+                "num_columns": 3,
+                "num_rows": 3
+            },
+            "marker_side": 0.01,
+            "marker_separation": 0.005,
+            "start_id": 0
+        }
+    },
+    {
+        "type": "grid",
+        "settings": {
+            "size": {
+                "num_columns": 4,
+                "num_rows": 4
+            },
+            "marker_side": 0.04,
+            "marker_separation": 0.03,
+            "start_id": 9
+        }
+    },
+    {
+        "type": "grid",
+        "settings": {
+            "size": {
+                "num_columns": 5,
+                "num_rows": 5
+            },
+            "marker_side": 0.04,
+            "marker_separation": 0.03,
+            "start_id": 25
+        }
+    },
+    {
+        "type": "box",
+        "settings": {
+            "size": {
+                "width": 0.04,
+                "height": 0.04,
+                "depth": 0.04
+            },
+            "markers": {
+                "forward": [
+                    {
+                        "id": 50,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "backward": [
+                    {
+                        "id": 51,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "left": [
+                    {
+                        "id": 52,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "right": [
+                    {
+                        "id": 53,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "up": [
+                    {
+                        "id": 54,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "down": [
+                    {
+                        "id": 55,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "box",
+        "settings": {
+            "size": {
+                "width": 0.04,
+                "height": 0.04,
+                "depth": 0.04
+            },
+            "markers": {
+                "forward": [
+                    {
+                        "id": 56,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "backward": [
+                    {
+                        "id": 57,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "left": [
+                    {
+                        "id": 58,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "right": [
+                    {
+                        "id": 59,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "up": [
+                    {
+                        "id": 60,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "down": [
+                    {
+                        "id": 61,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "box",
+        "settings": {
+            "size": {
+                "width": 0.04,
+                "height": 0.04,
+                "depth": 0.04
+            },
+            "markers": {
+                "forward": [
+                    {
+                        "id": 62,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "backward": [
+                    {
+                        "id": 63,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "left": [
+                    {
+                        "id": 64,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "right": [
+                    {
+                        "id": 65,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "up": [
+                    {
+                        "id": 66,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ],
+                "down": [
+                    {
+                        "id": 67,
+                        "x_offset": 0,
+                        "y_offset": 0,
+                        "rotation": 0,
+                        "side": 0.03
+                    }
+                ]
+            }
+        }
+    }
+]

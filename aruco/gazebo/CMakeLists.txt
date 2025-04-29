@@ -38,4 +38,5 @@ function(add_world)
 endfunction()
 
 add_subdirectory(box_world)
+add_subdirectory(demo_world)
 add_subdirectory(drone_world)
