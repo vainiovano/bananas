@@ -18,7 +18,7 @@
                 "num_columns": 4,
                 "num_rows": 4
             },
-            "marker_side": 0.04,
+            "marker_side": 0.05,
             "marker_separation": 0.03,
             "start_id": 9
         }
@@ -30,7 +30,7 @@
                 "num_columns": 5,
                 "num_rows": 5
             },
-            "marker_side": 0.04,
+            "marker_side": 0.05,
             "marker_separation": 0.03,
             "start_id": 25
         }
@@ -39,9 +39,9 @@
         "type": "box",
         "settings": {
             "size": {
-                "width": 0.04,
-                "height": 0.04,
-                "depth": 0.04
+                "width": 0.05,
+                "height": 0.05,
+                "depth": 0.05
             },
             "markers": {
                 "forward": [
@@ -50,7 +50,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "backward": [
@@ -59,7 +59,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "left": [
@@ -68,7 +68,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "right": [
@@ -77,7 +77,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "up": [
@@ -86,7 +86,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "down": [
@@ -95,7 +95,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ]
             }
@@ -105,9 +105,9 @@
         "type": "box",
         "settings": {
             "size": {
-                "width": 0.04,
-                "height": 0.04,
-                "depth": 0.04
+                "width": 0.05,
+                "height": 0.05,
+                "depth": 0.05
             },
             "markers": {
                 "forward": [
@@ -116,7 +116,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "backward": [
@@ -125,7 +125,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "left": [
@@ -134,7 +134,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "right": [
@@ -143,7 +143,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "up": [
@@ -152,7 +152,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "down": [
@@ -161,7 +161,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ]
             }
@@ -171,9 +171,9 @@
         "type": "box",
         "settings": {
             "size": {
-                "width": 0.04,
-                "height": 0.04,
-                "depth": 0.04
+                "width": 0.05,
+                "height": 0.05,
+                "depth": 0.05
             },
             "markers": {
                 "forward": [
@@ -182,7 +182,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "backward": [
@@ -191,7 +191,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "left": [
@@ -200,7 +200,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "right": [
@@ -209,7 +209,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "up": [
@@ -218,7 +218,7 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
                     }
                 ],
                 "down": [
@@ -227,7 +227,65 @@
                         "x_offset": 0,
                         "y_offset": 0,
                         "rotation": 0,
-                        "side": 0.03
+                        "side": 0.04
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "box",
+        "settings": {
+            "size": {
+                "width": 0.125,
+                "height": 0.134,
+                "depth": 0.18
+            },
+            "markers": {
+                "forward": [
+                    {
+                        "id": 68,
+                        "x_offset": -0.0195,
+                        "y_offset": 0.0515,
+                        "rotation": 0,
+                        "side": 0.024
+                    },
+                    {
+                        "id": 69,
+                        "x_offset": 0.018,
+                        "y_offset": 0.0515,
+                        "rotation": 0,
+                        "side": 0.024
+                    },
+                    {
+                        "id": 70,
+                        "x_offset": -0.0195,
+                        "y_offset": 0.0125,
+                        "rotation": 0,
+                        "side": 0.024
+                    },
+                    {
+                        "id": 71,
+                        "x_offset": 0.018,
+                        "y_offset": 0.0125,
+                        "rotation": 0,
+                        "side": 0.024
+                    }
+                ],
+                "left": [
+                    {
+                        "id": 72,
+                        "x_offset": -0.028,
+                        "y_offset": -0.0035,
+                        "rotation": 1.5707964,
+                        "side": 0.038
+                    },
+                    {
+                        "id": 73,
+                        "x_offset": 0.0315,
+                        "y_offset": -0.0035,
+                        "rotation": 1.5707964,
+                        "side": 0.038
                     }
                 ]
             }

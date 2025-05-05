@@ -9,14 +9,14 @@
     {
         "id": 1,
         "board_to_world": {
-            "translation": [-0.2, 0, 0, 0],
+            "translation": [-0.3, 0, 0, 0],
             "rotation": [1, 0, 0, 0]
         }
     },
     {
         "id": 2,
         "board_to_world": {
-            "translation": [0.2, 0, 0, 0],
+            "translation": [0.3, 0, 0, 0],
             "rotation": [1, 0, 0, 0]
         }
     }
