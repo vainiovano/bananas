@@ -30,8 +30,10 @@ const std::string topic_name{"aruco_camera/image"};
 
 int main(int argc, char *argv[]) {
     auto args{rclcpp::init_and_remove_ros_arguments(argc, argv)};
-    if (args.size() != 2) {
-        std::cerr << "Usage: " << argv[0] << " [camera|video_file]"
+    if (args.size() < 2) {
+        std::cerr << "Usage: " << argv[0] << " [camera|video_file] [camera_device]"
+                  << std::endl;
+        std::cerr << "Note: camera_device, width and height parameters are required for camera input"
                   << std::endl;
         return EXIT_FAILURE;
     }
@@ -45,20 +47,27 @@ int main(int argc, char *argv[]) {
 
     cv::VideoCapture capture;
     if (use_camera) {
-        // Open the camera using the V4L2 backend.
-        capture.open("/dev/video0", cv::CAP_V4L2);
-        if (!capture.isOpened()) {
-            std::cerr << "Error: Could not open camera device /dev/video0"
+        if (args.size() != 3) {
+            std::cerr << "Error: Camera input requires all parameters: camera_device width height"
                       << std::endl;
             return EXIT_FAILURE;
         }
-        std::cout << "Using camera device" << std::endl;
+
+        std::string camera_device = args[2];
+
+        // Open the camera using the V4L2 backend.
+        capture.open(camera_device, cv::CAP_V4L2);
+        if (!capture.isOpened()) {
+            std::cerr << "Error: Could not open camera device " << camera_device
+                      << std::endl;
+            return EXIT_FAILURE;
+        }
+        std::cout << "Using camera device: " << camera_device << std::endl;
 
         // Set camera properties.
         capture.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
         capture.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
         capture.set(cv::CAP_PROP_FPS, 30);
-
     } else {
         // Open the video file.
         capture.open(video_input);
@@ -72,14 +81,9 @@ int main(int argc, char *argv[]) {
 
     cv::Mat image;
     if (use_camera) {
-        // For live camera capture, determine a fixed delay from the FPS
-        // setting.
-        double fps = capture.get(cv::CAP_PROP_FPS);
-        if (fps <= 0.0) {
-            fps = 30.0; // Fallback FPS if camera doesn't report it correctly.
-        }
-        auto frame_duration =
-            std::chrono::milliseconds(static_cast<int>(1000.0 / fps));
+        // 30 Fps seems to be what jetson can handle
+        const int fps = 30;
+        auto frame_duration = std::chrono::milliseconds(static_cast<int>(1000.0 / fps));
 
         while (rclcpp::ok()) {
             if (!capture.read(image)) {
@@ -88,15 +92,12 @@ int main(int argc, char *argv[]) {
                 break;
             }
 
-            // Create and populate a header with the current timestamp.
             std_msgs::msg::Header header;
             header.stamp = node->now();
             header.frame_id = "camera_frame";
 
-            auto message =
-                cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8,
-                                   image)
-                    .toImageMsg();
+            auto message = cv_bridge::CvImage(header, sensor_msgs::image_encodings::MONO16, image)
+                      .toImageMsg();
             publisher.publish(message);
 
             rclcpp::spin_some(node);
@@ -125,10 +126,8 @@ int main(int argc, char *argv[]) {
             header.stamp = node->now();
             header.frame_id = "video_frame";
 
-            auto message =
-                cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8,
-                                   image)
-                    .toImageMsg();
+            auto message = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, image)
+                              .toImageMsg();
             publisher.publish(message);
 
             rclcpp::spin_some(node);
