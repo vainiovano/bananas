@@ -66,7 +66,7 @@ void fill_marker_data(
         positions[out_index++] = corner->z;
     }
 
-    constexpr std::array<const float, corners_per_marker *floats_per_texcoord>
+    constexpr std::array<const float, corners_per_marker * floats_per_texcoord>
         texture_coordinates = {
             0.0F, 1.0F, // Bottom left
             1.0F, 1.0F, // Bottom right
