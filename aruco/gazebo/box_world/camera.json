@@ -1,0 +1,11 @@
+{
+    "focal_length_x": 1663.1481170654297,
+    "focal_length_y": 1663.1480741500854,
+    "optical_center_x": 960,
+    "optical_center_y": 540,
+    "distortion_coefficients": [],
+    "camera_to_drone": {
+        "translation": [0, 0, 0, 0],
+        "rotation": [1, 0, 0, 0]
+    }
+}

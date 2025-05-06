@@ -15,39 +15,51 @@ TEST(GridBoardTest, GridBoardsWork) {
 
     ASSERT_EQ(board.obj_points.size(), 6);
 
-    const std::vector<cv::Point3f> expected_top_left{{-2.0F, 0.0F, -1.25F},
-                                                     {-1.0F, 0.0F, -1.25F},
-                                                     {-2.0F, 0.0F, -0.25F},
-                                                     {-1.0F, 0.0F, -0.25F}};
+    const std::vector<cv::Point3f> expected_top_left{
+        {-2.0F, 0.0F, -1.25F},
+        {-1.0F, 0.0F, -1.25F},
+        {-1.0F, 0.0F, -0.25F},
+        {-2.0F, 0.0F, -0.25F},
+    };
     EXPECT_EQ(board.obj_points[0], expected_top_left);
 
-    const std::vector<cv::Point3f> expected_top_middle{{-0.5F, 0.0F, -1.25F},
-                                                       {0.5F, 0.0F, -1.25F},
-                                                       {-0.5F, 0.0F, -0.25F},
-                                                       {0.5F, 0.0F, -0.25F}};
+    const std::vector<cv::Point3f> expected_top_middle{
+        {-0.5F, 0.0F, -1.25F},
+        {0.5F, 0.0F, -1.25F},
+        {0.5F, 0.0F, -0.25F},
+        {-0.5F, 0.0F, -0.25F},
+    };
     EXPECT_EQ(board.obj_points[1], expected_top_middle);
 
-    const std::vector<cv::Point3f> expected_top_right{{1.0F, 0.0F, -1.25F},
-                                                      {2.0F, 0.0F, -1.25F},
-                                                      {1.0F, 0.0F, -0.25F},
-                                                      {2.0F, 0.0F, -0.25F}};
+    const std::vector<cv::Point3f> expected_top_right{
+        {1.0F, 0.0F, -1.25F},
+        {2.0F, 0.0F, -1.25F},
+        {2.0F, 0.0F, -0.25F},
+        {1.0F, 0.0F, -0.25F},
+    };
     EXPECT_EQ(board.obj_points[2], expected_top_right);
 
-    const std::vector<cv::Point3f> expected_bottom_left{{-2.0F, 0.0F, 0.25F},
-                                                        {-1.0F, 0.0F, 0.25F},
-                                                        {-2.0F, 0.0F, 1.25F},
-                                                        {-1.0F, 0.0F, 1.25F}};
+    const std::vector<cv::Point3f> expected_bottom_left{
+        {-2.0F, 0.0F, 0.25F},
+        {-1.0F, 0.0F, 0.25F},
+        {-1.0F, 0.0F, 1.25F},
+        {-2.0F, 0.0F, 1.25F},
+    };
     EXPECT_EQ(board.obj_points[3], expected_bottom_left);
 
-    const std::vector<cv::Point3f> expected_bottom_middle{{-0.5F, 0.0F, 0.25F},
-                                                          {0.5F, 0.0F, 0.25F},
-                                                          {-0.5F, 0.0F, 1.25F},
-                                                          {0.5F, 0.0F, 1.25F}};
+    const std::vector<cv::Point3f> expected_bottom_middle{
+        {-0.5F, 0.0F, 0.25F},
+        {0.5F, 0.0F, 0.25F},
+        {0.5F, 0.0F, 1.25F},
+        {-0.5F, 0.0F, 1.25F},
+    };
     EXPECT_EQ(board.obj_points[4], expected_bottom_middle);
 
-    const std::vector<cv::Point3f> expected_bottom_right{{1.0F, 0.0F, 0.25F},
-                                                         {2.0F, 0.0F, 0.25F},
-                                                         {1.0F, 0.0F, 1.25F},
-                                                         {2.0F, 0.0F, 1.25F}};
+    const std::vector<cv::Point3f> expected_bottom_right{
+        {1.0F, 0.0F, 0.25F},
+        {2.0F, 0.0F, 0.25F},
+        {2.0F, 0.0F, 1.25F},
+        {1.0F, 0.0F, 1.25F},
+    };
     EXPECT_EQ(board.obj_points[5], expected_bottom_right);
 }

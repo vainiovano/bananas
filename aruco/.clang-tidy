@@ -19,3 +19,6 @@ Checks: "-*,
 CheckOptions:
     # misc-include-cleaner doesn't behave properly with Eigen or nlohmann JSON.
     misc-include-cleaner.IgnoreHeaders: 'Eigen/.*;nlohmann/.*'
+    # We shouldn't be hitting this exception much.
+    bugprone-exception-escape.IgnoredExceptions: 'bad_variant_access'
+    readability-function-cognitive-complexity.IgnoreMacros: true

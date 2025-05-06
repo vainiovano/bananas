@@ -6,7 +6,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-24.04
     container:
-      image: mainiomano/bananas-base:0.0.1
+      image: mainiomano/bananas-base:0.0.4
     defaults:
       run:
         working-directory: aruco
@@ -14,18 +14,32 @@ jobs:
       matrix:
         compiler: [g++, clang++]
         build_type: [Debug, Release]
+        with_ros2: ['OFF', 'ON']
     steps:
     - uses: actions/checkout@v4
-    - name: Configure ${{ matrix.compiler }} ${{ matrix.build_type }}
+    - name: Install dependencies
+      run: |
+        apt-get update && apt-get install -y --no-install-recommends \
+          clang \
+          clang-format \
+          clang-tidy \
+          git \
+          libclang-rt-dev \
+          parallel
+    - name: Configure ${{ matrix.compiler }} ${{ matrix.build_type }} WITH_ROS2=${{ matrix.with_ros2 }}
       env:
         CXXFLAGS: ${{ matrix.build_type == 'Debug' && '-Werror -fsanitize=undefined,address' || '-Werror' }}
-      run: cmake -GNinja -S . -B build-${{ matrix.compiler }}-${{ matrix.build_type }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-    - name: Build ${{ matrix.compiler }} ${{ matrix.build_type }}
-      run: cmake --build build-${{ matrix.compiler }}-${{ matrix.build_type }}
-    - name: Test ${{ matrix.compiler }} ${{ matrix.build_type }}
-      run: ctest --output-on-failure --test-dir build-${{ matrix.compiler }}-${{ matrix.build_type }}
-    - name: Lint
-      # Only run the lints once. Running them on more combinations wouldn't
-      # probably add much value.
+      run: |
+        if [ ${{ matrix.with_ros2 }} = ON ]; then
+          . /opt/ros/jazzy/setup.sh
+        fi
+        cmake -GNinja -S . -B build -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DWITH_ROS2=${{ matrix.with_ros2 }} -DCMAKE_PREFIX_PATH='/usr/opencv;/usr/ogre;/usr/cv_bridge;/usr/mavlink' -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    - name: Build ${{ matrix.compiler }} ${{ matrix.build_type }} WITH_ROS2=${{ matrix.with_ros2 }}
+      run: cmake --build build
+    - name: Test ${{ matrix.compiler }} ${{ matrix.build_type }} WITH_ROS2=${{ matrix.with_ros2 }}
+      run: ctest --output-on-failure --test-dir build
+    - name: Lint WITH_ROS2=${{ matrix.with_ros2 }}
+      # Only run the lints once per compiler configuration. Running them on more
+      # combinations wouldn't probably add much value.
       if: ${{ matrix.compiler == 'clang++' && matrix.build_type == 'Debug' }}
-      run: ./run_lint.sh build-${{ matrix.compiler }}-${{ matrix.build_type }}
+      run: ./run_lint.sh build

@@ -54,9 +54,9 @@ auto make_board(const GridSettings &settings) -> Board {
                 {cv::Point3f{marker_left, 0.0F, marker_top},
                  cv::Point3f{marker_left + settings.marker_side, 0.0F,
                              marker_top},
-                 cv::Point3f{marker_left, 0.0F,
-                             marker_top + settings.marker_side},
                  cv::Point3f{marker_left + settings.marker_side, 0.0F,
+                             marker_top + settings.marker_side},
+                 cv::Point3f{marker_left, 0.0F,
                              marker_top + settings.marker_side}});
         }
     }

@@ -1,0 +1,14 @@
+[
+    {
+        "type": "grid",
+        "settings": {
+            "size": {
+                "num_columns": 10,
+                "num_rows": 10
+            },
+            "marker_side": 0.1,
+            "marker_separation": 0.20,
+            "start_id": 0
+        }
+    }
+]

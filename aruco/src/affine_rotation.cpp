@@ -62,6 +62,18 @@ void from_json(const nlohmann::json &j, AffineRotation &affine_rotation) {
                        {rotation[0], rotation[1], rotation[2], rotation[3]}};
 }
 
+void to_json(nlohmann::json &j, const AffineRotation &affine_rotation) {
+    // TODO(vainiovano): Test that this actually works.
+    j["translation"] = affine_rotation.getTranslation();
+    const std::array<float, 4> rotation{
+        affine_rotation.getRotation().w(),
+        affine_rotation.getRotation().x(),
+        affine_rotation.getRotation().y(),
+        affine_rotation.getRotation().z(),
+    };
+    j["rotation"] = rotation;
+}
+
 auto from_cv(const cv::Vec3f &rvec, const cv::Vec3f &tvec) -> AffineRotation {
     Eigen::Vector3f rotation_vec;
     Eigen::Vector3f translation;

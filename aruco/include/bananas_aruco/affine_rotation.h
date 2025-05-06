@@ -36,6 +36,7 @@ class AffineRotation {
 };
 
 void from_json(const nlohmann::json &j, AffineRotation &affine_rotation);
+void to_json(nlohmann::json &j, const AffineRotation &affine_rotation);
 
 auto from_cv(const cv::Vec3f &rvec, const cv::Vec3f &tvec) -> AffineRotation;
 

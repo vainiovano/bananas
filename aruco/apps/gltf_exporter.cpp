@@ -4,11 +4,15 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
+#include <iomanip>
+#include <ios>
 #include <iostream>
 #include <limits>
 #include <numeric>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <gsl/span>
@@ -29,16 +33,21 @@
 #define TINYGLTF_NO_INCLUDE_JSON
 #include <tiny_gltf.h>
 
+#include <tinyxml2.h>
+
 #include <bananas_aruco/board.h>
 #include <bananas_aruco/box_board.h>
+#include <bananas_aruco/concrete_board.h>
+#include <bananas_aruco/grid_board.h>
 
 namespace {
 
 const char *const about{
-    "Generate a binary glTF file from a box ArUco marker placement"};
+    "Generate binary glTF and SDF files from a set of ArUco marker placements"};
 const char *const keys{
-    "{@inpath  | <none> | JSON file containing box description }"
-    "{@outpath | <none> | Output GLB file path }"};
+    "{@inpath  | <none> | JSON file containing box descriptions }"
+    "{o        | .      | Output directory }"
+    "{sdf      |        | Whether to generate SDF files for Gazebo }"};
 
 constexpr std::size_t corners_per_marker{4};
 constexpr std::size_t floats_per_position{3};
@@ -265,8 +274,8 @@ constexpr std::array<float,
     };
 
 /// Produce a glTF asset for the given box, including the markers.
-auto produce_box_model(const cv::aruco::Dictionary &dictionary,
-                       const board::BoxSettings &box) -> tinygltf::Model {
+auto produce_board(const cv::aruco::Dictionary &dictionary,
+                   const board::BoxSettings &box) -> tinygltf::Model {
     // 1. Add in the ArUco markers
     const cv::aruco::Board board{
         board::to_cv(dictionary, board::make_board(box))};
@@ -348,6 +357,132 @@ auto produce_box_model(const cv::aruco::Dictionary &dictionary,
     return model;
 }
 
+auto produce_board(const cv::aruco::Dictionary &dictionary,
+                   const board::GridSettings &grid) -> tinygltf::Model {
+    return produce_board_model(
+        board::to_cv(dictionary, board::make_board(grid)));
+}
+
+void produce_sdf_model_extras(tinyxml2::XMLPrinter & /*printer*/,
+                              const board::BoxSettings & /*box*/) {}
+
+void produce_sdf_model_extras(tinyxml2::XMLPrinter &printer,
+                              const board::GridSettings & /*grid*/) {
+    printer.OpenElement("static");
+    printer.PushText("true");
+    printer.CloseElement(); // </static>
+}
+
+void produce_sdf_link_extras(tinyxml2::XMLPrinter &printer,
+                             const board::BoxSettings &box) {
+    {
+        printer.OpenElement("collision");
+        printer.PushAttribute("name", "collision");
+        {
+            printer.OpenElement("density");
+            // TODO(vainiovano): Select a proper density.
+            printer.PushText("10.0");
+            printer.CloseElement(); // </density>
+        }
+        {
+            printer.OpenElement("geometry");
+            printer.OpenElement("box");
+            printer.OpenElement("size");
+            printer.PushText(box.size.width);
+            printer.PushText(" ");
+            printer.PushText(box.size.height);
+            printer.PushText(" ");
+            printer.PushText(box.size.depth);
+            printer.CloseElement(); // </size>
+            printer.CloseElement(); // </box>
+            printer.CloseElement(); // </geometry>
+        }
+        printer.CloseElement(); // </collision>
+    }
+    {
+        printer.OpenElement("inertial");
+        printer.PushAttribute("auto", true);
+        printer.CloseElement(); // </inertial>
+    }
+}
+
+void produce_sdf_link_extras(tinyxml2::XMLPrinter & /*printer*/,
+                             const board::GridSettings & /*grid*/) {}
+
+void produce_sdf(std::ostream &out, const std::string &name,
+                 const std::filesystem::path &gltf_path,
+                 const board::ConcreteBoard &board) {
+    tinyxml2::XMLPrinter printer{};
+    printer.PushHeader(false, true);
+
+    printer.OpenElement("sdf");
+    // SDFormat 1.11 (Gazebo Harmonic) added support for automatically computed
+    // inertia.
+    printer.PushAttribute("version", "1.11");
+
+    printer.OpenElement("model");
+    printer.PushAttribute("name", name.c_str());
+    std::visit(
+        [&printer](const auto &board) {
+            produce_sdf_model_extras(printer, board);
+        },
+        board);
+    printer.OpenElement("link");
+    printer.PushAttribute("name", "link");
+    {
+        printer.OpenElement("pose");
+        printer.PushAttribute("degrees", true);
+        // Gazebo's glTF importer does not convert the coordinate system
+        // correctly. In the Gazebo coordinate system [1], +X is forward, +Y is
+        // left and +Z is up, so fix up our model pose to match it.
+        //
+        // [1] https://gazebosim.org/api/sim/8/frame_reference.html
+        printer.PushText("0 0 0 90 0 90");
+        printer.CloseElement(); // </pose>
+    }
+    {
+        printer.OpenElement("visual");
+        printer.PushAttribute("name", "visual");
+        {
+            printer.OpenElement("geometry");
+            printer.OpenElement("mesh");
+            printer.OpenElement("uri");
+            printer.PushText(
+                (std::string{"model://"} + gltf_path.string()).c_str());
+            printer.CloseElement(); // </uri>
+            printer.CloseElement(); // </mesh>
+            printer.CloseElement(); // </geometry>
+        }
+        printer.CloseElement(); // </visual>
+    }
+    std::visit(
+        [&printer](const auto &board) {
+            produce_sdf_link_extras(printer, board);
+        },
+        board);
+    printer.CloseElement(); // </link>
+    printer.CloseElement(); // </model>
+    printer.CloseElement(); // </sdf>
+
+    out.write(printer.CStr(),
+              static_cast<std::streamsize>(printer.CStrSize() - 1));
+}
+
+void produce_failed_open_diagnostics(std::ostream &stream,
+                                     const std::filesystem::path &out_dir,
+                                     const std::filesystem::path &out_path) {
+    stream << "Failed to open output file "
+           << std::quoted(out_path.string(), '`') << '\n';
+    // Racy, but hopefully fine for error checking.
+    if (!std::filesystem::exists(out_dir)) {
+        stream << "Note: directory " << std::quoted(out_dir.string(), '`')
+               << " does not exist.\n";
+    } else if (!std::filesystem::is_directory(out_dir)) {
+        stream << "Note: " << std::quoted(out_dir.string(), '`')
+               << " is not a directory.\n";
+    }
+}
+
 } // namespace
 
 auto main(int argc, char *argv[]) -> int {
@@ -355,7 +490,8 @@ auto main(int argc, char *argv[]) -> int {
     parser.about(about);
 
     const auto in_path{parser.get<std::string>(0)};
-    const auto out_path{parser.get<std::string>(1)};
+    const std::filesystem::path out_dir{parser.get<std::string>("o")};
+    const auto want_sdf{parser.has("sdf")};
     if (!parser.check()) {
         parser.printErrors();
         parser.printMessage();
@@ -365,7 +501,7 @@ auto main(int argc, char *argv[]) -> int {
     const cv::aruco::Dictionary dictionary{cv::aruco::getPredefinedDictionary(
         cv::aruco::PredefinedDictionaryType::DICT_5X5_100)};
 
-    board::BoxSettings box_settings;
+    std::vector<board::ConcreteBoard> board_settings;
     {
         std::ifstream in_stream{in_path};
         if (!in_stream) {
@@ -374,34 +510,73 @@ auto main(int argc, char *argv[]) -> int {
         }
 
         try {
-            board::from_json(nlohmann::json::parse(in_stream), box_settings);
+            const auto json = nlohmann::json::parse(in_stream);
+            json.get_to(board_settings);
         } catch (const nlohmann::json::exception &e) {
-            std::cerr << "Failed to parse box description file: " << e.what()
+            std::cerr << "Failed to parse board description file: " << e.what()
                       << '\n';
             return EXIT_FAILURE;
         }
     }
 
-    const auto model{produce_box_model(dictionary, box_settings)};
+    for (std::size_t i{0}; i < board_settings.size(); ++i) {
+        const std::string out_stem{std::string{"board_"} + std::to_string(i)};
+        const std::string gltf_filename{out_stem + std::string{".glb"}};
+        const std::filesystem::path gltf_out_path{out_dir / gltf_filename};
+        const auto model{std::visit(
+            [&dictionary](const auto &board) {
+                return produce_board(dictionary, board);
+            },
+            board_settings[i])};
 
-    std::ofstream out_stream{out_path,
-                             std::ios_base::out | std::ios_base::binary};
-    if (!out_stream) {
-        std::cerr << "Failed to open output file\n";
-        return EXIT_FAILURE;
-    }
+        {
+            std::ofstream gltf_out{gltf_out_path,
+                                   std::ios_base::out | std::ios_base::binary};
+            if (!gltf_out) {
+                produce_failed_open_diagnostics(std::cerr, out_dir,
+                                                gltf_out_path);
+                return EXIT_FAILURE;
+            }
 
-    try {
-        tinygltf::TinyGLTF gltf{};
-        gltf.WriteGltfSceneToStream(&model, out_stream, false, true);
-    } catch (const nlohmann::json::exception &e) {
-        std::cerr << "Failed to write JSON output: " << e.what() << '\n';
-        return EXIT_FAILURE;
-    }
+            try {
+                tinygltf::TinyGLTF gltf{};
+                gltf.WriteGltfSceneToStream(&model, gltf_out, false, true);
+            } catch (const nlohmann::json::exception &e) {
+                std::cerr << "Failed to write JSON output to "
+                          << std::quoted(gltf_out_path.string(), '`') << ": "
+                          << e.what() << '\n';
+                return EXIT_FAILURE;
+            }
 
-    out_stream.close();
-    if (!out_stream) {
-        std::cerr << "Failed to write to output file\n";
-        return EXIT_FAILURE;
+            gltf_out.close();
+            if (!gltf_out) {
+                std::cerr << "Failed to write to glTF file "
+                          << std::quoted(gltf_out_path.string(), '`') << '\n';
+                return EXIT_FAILURE;
+            }
+            std::cerr << "Wrote " << std::quoted(gltf_out_path.string(), '`')
+                      << '\n';
+        }
+        if (want_sdf) {
+            const std::string sdf_filename{out_stem + std::string{".sdf"}};
+            const std::filesystem::path sdf_out_path{out_dir / sdf_filename};
+            std::ofstream sdf_out{sdf_out_path, std::ios_base::out};
+            if (!sdf_out) {
+                produce_failed_open_diagnostics(std::cerr, out_dir,
+                                                sdf_out_path);
+                return EXIT_FAILURE;
+            }
+
+            produce_sdf(sdf_out, out_stem, gltf_out_path, board_settings[i]);
+
+            sdf_out.close();
+            if (!sdf_out) {
+                std::cerr << "Failed to write to SDF file "
+                          << std::quoted(sdf_out_path.string(), '`') << '\n';
+                return EXIT_FAILURE;
+            }
+            std::cerr << "Wrote " << std::quoted(sdf_out_path.string(), '`')
+                      << '\n';
+        }
     }
 }

@@ -1,0 +1,72 @@
+[
+    {
+        "type": "grid",
+        "settings": {
+            "size": {
+                "num_columns": 5,
+                "num_rows": 5
+            },
+            "marker_side": 0.0238,
+            "marker_separation": 0.0134,
+            "start_id": 0
+        }
+    },
+    {
+        "type": "box",
+        "settings": {
+            "size": {
+                "width": 0.125,
+                "height": 0.134,
+                "depth": 0.18
+            },
+            "markers": {
+                "forward": [
+                    {
+                        "id": 43,
+                        "x_offset": -0.0195,
+                        "y_offset": 0.0515,
+                        "rotation": 0,
+                        "side": 0.024
+                    },
+                    {
+                        "id": 44,
+                        "x_offset": 0.018,
+                        "y_offset": 0.0515,
+                        "rotation": 0,
+                        "side": 0.024
+                    },
+                    {
+                        "id": 48,
+                        "x_offset": -0.0195,
+                        "y_offset": 0.0125,
+                        "rotation": 0,
+                        "side": 0.024
+                    },
+                    {
+                        "id": 49,
+                        "x_offset": 0.018,
+                        "y_offset": 0.0125,
+                        "rotation": 0,
+                        "side": 0.024
+                    }
+                ],
+                "left": [
+                    {
+                        "id": 27,
+                        "x_offset": -0.028,
+                        "y_offset": -0.0035,
+                        "rotation": 1.5707964,
+                        "side": 0.038
+                    },
+                    {
+                        "id": 30,
+                        "x_offset": 0.0315,
+                        "y_offset": -0.0035,
+                        "rotation": 1.5707964,
+                        "side": 0.038
+                    }
+                ]
+            }
+        }
+    }
+]

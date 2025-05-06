@@ -1,0 +1,9 @@
+[
+    {
+        "id": 0,
+        "board_to_world": {
+            "translation": [0, 0, 0, 0],
+            "rotation": [1, 0, 0, 0]
+        }
+    }
+]
