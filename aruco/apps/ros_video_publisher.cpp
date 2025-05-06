@@ -1,7 +1,6 @@
 #ifdef ENABLE_ROS2
 
 #include <chrono>
-#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -40,7 +39,7 @@ int main(int argc, char *argv[]) {
     }
 
     const std::string &video_input{args[1]};
-    bool use_camera = (video_input == "camera");
+    const bool use_camera = (video_input == "camera");
 
     auto node = rclcpp::Node::make_shared(node_name);
     image_transport::ImageTransport it{node};
@@ -55,7 +54,7 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        std::string camera_device = args[2];
+        const std::string camera_device = args[2];
 
         // Open the camera using the V4L2 backend.
         capture.open(camera_device, cv::CAP_V4L2);
@@ -122,9 +121,9 @@ int main(int argc, char *argv[]) {
             }
 
             // Use the video's timestamp (in milliseconds) to compute the delay.
-            double pos_msec = capture.get(cv::CAP_PROP_POS_MSEC);
-            rclcpp::Duration target_after_start{std::chrono::nanoseconds(
-                static_cast<long long>(pos_msec * 1e6))};
+            const double pos_msec = capture.get(cv::CAP_PROP_POS_MSEC);
+            const rclcpp::Duration target_after_start{std::chrono::nanoseconds(
+                static_cast<int64>(pos_msec * 1e6))};
             clock.sleep_until(start_time + target_after_start);
 
             std_msgs::msg::Header header;
