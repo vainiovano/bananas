@@ -31,9 +31,10 @@ const std::string topic_name{"aruco_camera/image"};
 int main(int argc, char *argv[]) {
     auto args{rclcpp::init_and_remove_ros_arguments(argc, argv)};
     if (args.size() < 2) {
-        std::cerr << "Usage: " << argv[0] << " [camera|video_file] [camera_device]"
-                  << std::endl;
-        std::cerr << "Note: camera_device, width and height parameters are required for camera input"
+        std::cerr << "Usage: " << argv[0]
+                  << " [camera|video_file] [camera_device]" << std::endl;
+        std::cerr << "Note: camera_device, width and height parameters are "
+                     "required for camera input"
                   << std::endl;
         return EXIT_FAILURE;
     }
@@ -48,7 +49,8 @@ int main(int argc, char *argv[]) {
     cv::VideoCapture capture;
     if (use_camera) {
         if (args.size() != 3) {
-            std::cerr << "Error: Camera input requires all parameters: camera_device width height"
+            std::cerr << "Error: Camera input requires all parameters: "
+                         "camera_device width height"
                       << std::endl;
             return EXIT_FAILURE;
         }
@@ -83,7 +85,8 @@ int main(int argc, char *argv[]) {
     if (use_camera) {
         // 30 Fps seems to be what jetson can handle
         const int fps = 30;
-        auto frame_duration = std::chrono::milliseconds(static_cast<int>(1000.0 / fps));
+        auto frame_duration =
+            std::chrono::milliseconds(static_cast<int>(1000.0 / fps));
 
         while (rclcpp::ok()) {
             if (!capture.read(image)) {
@@ -96,8 +99,10 @@ int main(int argc, char *argv[]) {
             header.stamp = node->now();
             header.frame_id = "camera_frame";
 
-            auto message = cv_bridge::CvImage(header, sensor_msgs::image_encodings::MONO16, image)
-                      .toImageMsg();
+            auto message =
+                cv_bridge::CvImage(header, sensor_msgs::image_encodings::MONO16,
+                                   image)
+                    .toImageMsg();
             publisher.publish(message);
 
             rclcpp::spin_some(node);
@@ -126,8 +131,10 @@ int main(int argc, char *argv[]) {
             header.stamp = node->now();
             header.frame_id = "video_frame";
 
-            auto message = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, image)
-                              .toImageMsg();
+            auto message =
+                cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8,
+                                   image)
+                    .toImageMsg();
             publisher.publish(message);
 
             rclcpp::spin_some(node);
