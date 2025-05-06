@@ -122,8 +122,8 @@ int main(int argc, char *argv[]) {
 
             // Use the video's timestamp (in milliseconds) to compute the delay.
             const double pos_msec = capture.get(cv::CAP_PROP_POS_MSEC);
-            const rclcpp::Duration target_after_start{std::chrono::nanoseconds(
-                static_cast<int64>(pos_msec * 1e6))};
+            const rclcpp::Duration target_after_start{
+                std::chrono::nanoseconds(static_cast<int64>(pos_msec * 1e6))};
             clock.sleep_until(start_time + target_after_start);
 
             std_msgs::msg::Header header;
